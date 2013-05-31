@@ -1,23 +1,12 @@
 require 'csv'
+require_relative '../db/config'
+require_relative '../app/models/politician'
 
-class SunlightLegislatorsImporter
+class SunlightLegislatorsImporter < ActiveRecord::Base
   def self.import(filename)
-    csv = CSV.new(File.open(filename), :headers => true)
-    csv.each do |row|
-      row.each do |field, value|
-        # TODO: begin
-        raise NotImplementedError, "TODO: figure out what to do with this row and do it!"
-        # TODO: end
-      end
+
+    CSV.foreach(filename, headers: true, :header_converters => :symbol) do |row|
+      Politician.new(row.to_hash).save
     end
   end
-end
-
-begin
-  raise ArgumentError, "you must supply a filename argument" unless ARGV.length == 1
-  SunlightLegislatorsImporter.import(ARGV[0])
-rescue ArgumentError => e
-  $stderr.puts "Usage: ruby sunlight_legislators_importer.rb <filename>"
-rescue NotImplementedError => e
-  $stderr.puts "You shouldn't be running this until you've modified it with your implementation!"
 end
